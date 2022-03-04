@@ -1,21 +1,39 @@
 package liberty.tools;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.core.variables.IStringVariableManager;
+import org.eclipse.core.variables.VariablesPlugin;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tm.terminal.view.core.TerminalServiceFactory;
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalService;
 import org.eclipse.tm.terminal.view.core.interfaces.constants.ITerminalsConnectorConstants;
+import org.eclipse.tm.terminal.view.ui.activator.UIPlugin;
+import org.eclipse.tm.terminal.view.ui.interfaces.IPreferenceKeys;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchEncoding;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.osgi.framework.Bundle;
 
 import liberty.tools.utils.Dialog;
 import liberty.tools.utils.Project;
@@ -50,8 +68,10 @@ public class DevModeOperations {
                     System.out.println("Maven build file on project" + projName + " is not valid..");
                 }
 
-                cmd = "mvn io.openliberty.tools:liberty-maven-plugin:dev -f " + projectPath;
+                //cmd = "mvn io.openliberty.tools:liberty-maven-plugin:dev -f " + projectPath;
+                cmd = "mvn.cmd";
                 cmd = Paths.get(getMavenInstallHome(), "bin", cmd).toString();
+                cmd = cmd + " io.openliberty.tools:liberty-maven-plugin:dev -f " + projectPath + " &";
             } else if (Project.isGradle(project)) {
                 if (!Project.isGradleBuildFileValid(project)) {
                     System.out.println("Build file on project" + projName + " is not valid.");
@@ -297,15 +317,163 @@ public class DevModeOperations {
         List<String> envs = new ArrayList<String>(1);
         envs.add("JAVA_HOME=" + getJavaInstallHome());
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(ITerminalsConnectorConstants.PROP_TITLE, "Liberty DevMode");
-        properties.put(ITerminalsConnectorConstants.PROP_ENCODING, "UTF-8");
-        properties.put(ITerminalsConnectorConstants.PROP_DELEGATE_ID, "org.eclipse.tm.terminal.connector.local.launcher.local");
-        properties.put(ITerminalsConnectorConstants.PROP_PROCESS_PATH, cmd);
-        properties.put(ITerminalsConnectorConstants.PROP_PROCESS_ENVIRONMENT, envs.toArray(new String[envs.size()]));
-        properties.put(ITerminalsConnectorConstants.PROP_PROCESS_MERGE_ENVIRONMENT, true);
+        
+		// Set the terminal tab title
+        String terminalTitle = "Liberty DevMode";
+        properties.put(ITerminalsConnectorConstants.PROP_TITLE, terminalTitle);
 
-        ITerminalService ts = TerminalServiceFactory.getService();
-        ts.openConsole(properties, done);
+		// If not configured, set the default encodings for the local terminal
+		if (!properties.containsKey(ITerminalsConnectorConstants.PROP_ENCODING)) {
+			String encoding = null;
+			// Set the default encoding:
+			//     Default UTF-8 on Mac or Windows for Local, Preferences:Platform encoding otherwise
+			if (Platform.OS_MACOSX.equals(Platform.getOS()) || Platform.OS_WIN32.equals(Platform.getOS())) {
+				encoding = "UTF-8"; //$NON-NLS-1$
+			} else {
+				encoding = WorkbenchEncoding.getWorkbenchDefaultEncoding();
+			}
+			if (encoding != null && !"".equals(encoding)) //$NON-NLS-1$
+				properties.put(ITerminalsConnectorConstants.PROP_ENCODING, encoding);
+		}
+
+		// For local terminals, force a new terminal tab each time it is launched,
+		// if not set otherwise from outside
+		if (!properties.containsKey(ITerminalsConnectorConstants.PROP_FORCE_NEW)) {
+			properties.put(ITerminalsConnectorConstants.PROP_FORCE_NEW, Boolean.TRUE);
+		}
+
+		// Initialize the local terminal working directory.
+		if (!properties.containsKey(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR)) {
+			// By default, start the local terminal in the users home directory
+			String initialCwd = org.eclipse.tm.terminal.view.ui.activator.UIPlugin.getScopedPreferences()
+					.getString(IPreferenceKeys.PREF_LOCAL_TERMINAL_INITIAL_CWD);
+			String cwd = null;
+			if (initialCwd == null || IPreferenceKeys.PREF_INITIAL_CWD_USER_HOME.equals(initialCwd)
+					|| "".equals(initialCwd.trim())) { //$NON-NLS-1$
+				cwd = System.getProperty("user.home"); //$NON-NLS-1$
+			} else if (IPreferenceKeys.PREF_INITIAL_CWD_ECLIPSE_HOME.equals(initialCwd)) {
+				String eclipseHomeLocation = System.getProperty("eclipse.home.location"); //$NON-NLS-1$
+				if (eclipseHomeLocation != null) {
+					try {
+						URI uri = URIUtil.fromString(eclipseHomeLocation);
+						File f = URIUtil.toFile(uri);
+						cwd = f.getAbsolutePath();
+					} catch (URISyntaxException ex) {
+						/* ignored on purpose */ }
+				}
+			} else if (IPreferenceKeys.PREF_INITIAL_CWD_ECLIPSE_WS.equals(initialCwd)) {
+				Bundle bundle = Platform.getBundle("org.eclipse.core.resources"); //$NON-NLS-1$
+				if (bundle != null && bundle.getState() != Bundle.UNINSTALLED && bundle.getState() != Bundle.STOPPING) {
+					if (org.eclipse.core.resources.ResourcesPlugin.getWorkspace() != null
+							&& org.eclipse.core.resources.ResourcesPlugin.getWorkspace().getRoot() != null
+							&& org.eclipse.core.resources.ResourcesPlugin.getWorkspace().getRoot()
+									.getLocation() != null) {
+						cwd = org.eclipse.core.resources.ResourcesPlugin.getWorkspace().getRoot().getLocation()
+								.toOSString();
+					}
+				}
+			} else {
+				try {
+					// Resolve possible dynamic variables
+					IStringVariableManager vm = VariablesPlugin.getDefault().getStringVariableManager();
+					String resolved = vm.performStringSubstitution(initialCwd);
+
+					IPath p = new org.eclipse.core.runtime.Path(resolved);
+					if (p.toFile().canRead() && p.toFile().isDirectory()) {
+						cwd = p.toOSString();
+					}
+				} catch (CoreException ex) {
+					if (Platform.inDebugMode()) {
+						UIPlugin.getDefault().getLog().log(ex.getStatus());
+					}
+				}
+			}
+
+			if (cwd != null && !"".equals(cwd)) { //$NON-NLS-1$
+				properties.put(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR, cwd);
+			}
+		}
+
+		// If the current selection resolved to an folder, default the working directory
+		// to that folder and update the terminal title
+		ISelectionService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
+		if ((service != null && service.getSelection() != null)
+				|| properties.containsKey(ITerminalsConnectorConstants.PROP_SELECTION)) {
+			ISelection selection = (ISelection) properties.get(ITerminalsConnectorConstants.PROP_SELECTION);
+			if (selection == null)
+				selection = service.getSelection();
+			if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+				String dir = null;
+				Iterator<?> iter = ((IStructuredSelection) selection).iterator();
+				while (iter.hasNext()) {
+					Object element = iter.next();
+
+					Bundle bundle = Platform.getBundle("org.eclipse.core.resources"); //$NON-NLS-1$
+					if (bundle != null && bundle.getState() != Bundle.UNINSTALLED
+							&& bundle.getState() != Bundle.STOPPING) {
+						// If the element is not an IResource, try to adapt to IResource
+						if (!(element instanceof org.eclipse.core.resources.IResource)) {
+							Object adapted = element instanceof IAdaptable
+									? ((IAdaptable) element).getAdapter(org.eclipse.core.resources.IResource.class)
+									: null;
+							if (adapted == null)
+								adapted = Platform.getAdapterManager().getAdapter(element,
+										org.eclipse.core.resources.IResource.class);
+							if (adapted != null)
+								element = adapted;
+						}
+
+						if (element instanceof org.eclipse.core.resources.IResource
+								&& ((org.eclipse.core.resources.IResource) element).exists()) {
+							IPath location = ((org.eclipse.core.resources.IResource) element).getLocation();
+							if (location == null)
+								continue;
+							if (location.toFile().isFile())
+								location = location.removeLastSegments(1);
+							if (location.toFile().isDirectory() && location.toFile().canRead()) {
+								dir = location.toFile().getAbsolutePath();
+								break;
+							}
+						}
+
+						if (element instanceof IPath || element instanceof File) {
+							File f = element instanceof IPath ? ((IPath) element).toFile() : (File) element;
+							if (f.isDirectory() && f.canRead()) {
+								dir = f.getAbsolutePath();
+								break;
+							}
+						}
+					}
+				}
+				if (dir != null) {
+					properties.put(ITerminalsConnectorConstants.PROP_PROCESS_WORKING_DIR, dir);
+
+					String basename = new org.eclipse.core.runtime.Path(dir).lastSegment();
+					properties.put(ITerminalsConnectorConstants.PROP_TITLE, basename + " (" + terminalTitle + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+
+		// Get the terminal service
+		ITerminalService terminal = TerminalServiceFactory.getService();
+		// If not available, we cannot fulfill this request
+		if (terminal != null) {
+			terminal.openConsole(properties, done);
+		}        
+        
+        
+        
+        
+//        properties.put(ITerminalsConnectorConstants.PROP_TITLE, "Liberty DevMode");
+//        properties.put(ITerminalsConnectorConstants.PROP_ENCODING, "UTF-8");
+//        properties.put(ITerminalsConnectorConstants.PROP_DELEGATE_ID, "org.eclipse.tm.terminal.connector.local.launcher.local");
+//        properties.put(ITerminalsConnectorConstants.PROP_PROCESS_PATH, cmd);
+//        properties.put(ITerminalsConnectorConstants.PROP_PROCESS_ENVIRONMENT, envs.toArray(new String[envs.size()]));
+//        properties.put(ITerminalsConnectorConstants.PROP_PROCESS_MERGE_ENVIRONMENT, true);
+
+//        ITerminalService ts = TerminalServiceFactory.getService();
+//        ts.openConsole(properties, done);
+        System.out.println("AJM: back");
     }
 
     /**

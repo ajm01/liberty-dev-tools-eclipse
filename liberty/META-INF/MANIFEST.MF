@@ -12,7 +12,9 @@ Require-Bundle: org.eclipse.ui,
  org.gradle.toolingapi;bundle-version="[6.0.0,7.0.0)",
  org.eclipse.tm.terminal.view.core;bundle-version="[4.6.0,5.0.0)",
  org.eclipse.ui.browser;bundle-version="[3.6.0,4.0.0)",
- org.eclipse.ui.console;bundle-version="[3.9.0,3.12.0)"
+ org.eclipse.ui.console;bundle-version="[3.9.0,3.12.0)",
+ org.eclipse.tm.terminal.view.ui;bundle-version="4.10.200"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: liberty
 Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.core.variables
