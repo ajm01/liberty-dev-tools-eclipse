@@ -76,4 +76,39 @@
          </run>
       </runtime>
   </extension>
+  
+  <!--
+   <extension
+   		point="org.eclipse.core.contenttype.contentTypes">
+		<content-type 
+			id="libertyCFGFiles"
+			name="Liberty Config Files"
+			file-extensions="txt">
+		</content-type>
+   </extension>
+  -->
+  
+ <!-- add the liberty server.xml LS support -->  
+ <extension
+      point="org.eclipse.wildwebdeveloper.xml.lemminxExtension">
+    <jar
+          path="lib/lemminx-liberty-1.0-SNAPSHOT-jar-with-dependencies.jar">
+    </jar>
+ </extension>
+ 
+<!-- 
+    <extension
+         point="org.eclipse.lsp4e.languageServer">
+      <server
+            class="liberty.tools.LibertyLSConnection"
+            id="liberty.tools.libertyls"
+            label="JLiberty Config Language Server"
+            clientImpl="liberty.tools.LibertyLanguageClient" >
+      </server>
+      <contentTypeMapping
+            contentType="libertyCFGFiles"
+            id="liberty.tools.libertyls">
+      </contentTypeMapping>
+   </extension>
+   -->
 </plugin>
