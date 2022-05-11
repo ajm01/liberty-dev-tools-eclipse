@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+ <!-- add the liberty server.xml LS support -->  
+ <extension
+      point="org.eclipse.wildwebdeveloper.xml.lemminxExtension">
+    <jar
+          path="lib/lemminx-liberty-1.0-SNAPSHOT-jar-with-dependencies.jar">
+    </jar>
+ </extension>
+ 
+ 
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-names="server.env"
+            id="io.openliberty.serverenv"
+            name="Liberty Server Env"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-names="bootstrap.properties"
+            id="io.openliberty.bootstrapprops"
+            name="Liberty Bootstrap Properties"
+            priority="normal">
+      </content-type>
+   </extension>   
+   
+      <extension
+         point="org.eclipse.ui.editors">
+      <editorContentTypeBinding
+            contentTypeId="io.openliberty.serverenv"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+      </extension>
+      
+      <extension
+         point="org.eclipse.ui.editors">
+      <editorContentTypeBinding
+            contentTypeId="io.openliberty.bootstrapprops"
+            editorId="org.eclipse.ui.genericeditor.GenericEditor">
+      </editorContentTypeBinding>
+      </extension>      
+   
+    <extension
+         point="org.eclipse.lsp4e.languageServer">
+      <server
+            class="liberty.tools.libertyconfigls.LibertyConfigConnection"
+            id="io.openliberty.libertycfgls"
+            label="Liberty Config Language Server"
+            clientImpl="liberty.tools.libertyconfigls.LibertyConfigClient" >
+      </server>
+      <contentTypeMapping
+            contentType="io.openliberty.serverenv"
+            id="io.openliberty.libertycfgls">
+      </contentTypeMapping>
+      <contentTypeMapping
+            contentType="io.openliberty.bootstrapprops"
+            id="io.openliberty.libertycfgls">
+      </contentTypeMapping>      
+   </extension>
+</plugin>
