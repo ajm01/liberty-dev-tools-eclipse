@@ -72,6 +72,7 @@ public class DevModeOperations {
      * PATH environment variable.
      */
     private String pathEnv;
+    private String runasStartParms;
 
     /**
      * The instance of this class.
@@ -122,6 +123,7 @@ public class DevModeOperations {
      * @param inputProject The project instance to associate with this action.
      */
     public void start(IProject inputProject) {
+
         // Get the object representing the selected application project. The returned project should never be null, but check it
         // just in case it is.
         IProject iProject = inputProject;
@@ -140,6 +142,12 @@ public class DevModeOperations {
                 Trace.getTracer().trace(Trace.TRACE_TOOLS, msg + " No-op.");
             }
             Dialog.displayErrorMessage(msg);
+            return;
+        }
+
+        // if there were startParms entered as a run-as parameter
+        if (!runasStartParms.isEmpty()) {
+            startWithParms(inputProject, runasStartParms);
             return;
         }
 
@@ -1170,5 +1178,10 @@ public class DevModeOperations {
                 }
             }
         }
+    }
+
+    public void setStartParams(String startParms) {
+        runasStartParms = startParms;
+
     }
 }

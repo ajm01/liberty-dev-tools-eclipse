@@ -73,6 +73,7 @@ public class LaunchConfigurationDelegateLauncher extends LaunchConfigurationDele
                     devModeOps.verifyProjectSupport(iProject);
 
                     startParms = configuration.getAttribute(MainTab.START_PARM, (String) null);
+                    devModeOps.setStartParams(startParms);
                 } catch (Exception e) {
                     String msg = "An error was detected while launching configuration " + configuration.getName() + ".";
                     if (Trace.isEnabled()) {
