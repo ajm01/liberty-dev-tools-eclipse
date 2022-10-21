@@ -26,8 +26,8 @@ Since the Liberty Tools feature uses the well-known environment variables: PATH 
 There are several methods that can be used to potentially address this on MacOS:
 
 1. Start eclipse from the command line:
-  - To ensure that eclipse gets the correct PATH information, start eclipse from the command line in the eclipse IDE installation directory
-  - `PATH=$PATH ./eclipse`
+    - To ensure that eclipse gets the correct PATH information, start eclipse from the command line in the eclipse IDE installation directory
+    - `PATH=$PATH ./eclipse`
 
 2. Start eclipse through Finder:
   - right-click your Eclipse application and choose Show Package Contents.
