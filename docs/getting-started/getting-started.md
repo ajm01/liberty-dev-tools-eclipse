@@ -30,13 +30,13 @@ There are several methods that can be used to potentially address this on MacOS:
     - `PATH=$PATH ./eclipse`
 
 2. Start eclipse through Finder:
-  - right-click your Eclipse application and choose Show Package Contents.
-  - Enter the newly displayed Contents folder, select MacOS, and then run Eclipse by clicking the displayed executable.
+    - right-click your Eclipse application and choose Show Package Contents.
+    - Enter the newly displayed Contents folder, select MacOS, and then run Eclipse by clicking the displayed executable.
 
 3. Generate a mvn wrapper into the project:
-  - In your project folder execute the mvn wrapper create command:
-  - `mvn org.apache.maven.plugins:maven-wrapper-plugin:3.1.1:wrapper`
-  - start eclipse as normal
+    - In your project folder execute the mvn wrapper create command:
+    - `mvn org.apache.maven.plugins:maven-wrapper-plugin:3.1.1:wrapper`
+    - start eclipse as normal
 
 ## Opening the Liberty tools dashboard view
 
