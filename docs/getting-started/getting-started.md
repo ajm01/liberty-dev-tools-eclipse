@@ -27,7 +27,7 @@ There are several methods that can be used to potentially address this on MacOS:
 
 Start eclipse from the command line:
 - To ensure that eclipse gets the correct PATH information, start eclipse from the command line in the eclipse IDE installation directory
-- `>PATH=$PATH ./eclipse`
+- `PATH=$PATH ./eclipse`
 
 Start eclipse through Finder:
 - right-click your Eclipse application and choose Show Package Contents.
@@ -35,7 +35,7 @@ Start eclipse through Finder:
 
 Generate a mvn wrapper into the project:
 - In your project folder execute the mvn wrapper create command:
-- `>mvn org.apache.maven.plugins:maven-wrapper-plugin:3.1.1:wrapper`
+- `mvn org.apache.maven.plugins:maven-wrapper-plugin:3.1.1:wrapper`
 - start eclipse as normal
 
 ## Opening the Liberty tools dashboard view
