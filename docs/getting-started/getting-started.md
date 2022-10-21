@@ -21,6 +21,7 @@
   - Liberty Gradle Plugin -> 3.4.1
 
 ### Avoid trouble - Starting Eclipse with the correct environment on MacOS
+
 Since the Liberty Tools feature uses the well-known environment variables: PATH and JAVA_HOME, you will encounter problems on MacOS if these variables are not set within your Eclipse IDE process, e.g. the mvn executable might not be found.
 
 There are several methods that can be used to potentially address this on MacOS:
