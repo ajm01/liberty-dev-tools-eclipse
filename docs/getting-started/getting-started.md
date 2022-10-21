@@ -23,13 +23,12 @@
 ### Avoid trouble - Starting Eclipse with the correct environment on MacOS
 Since the Liberty Tools feature uses the well-known environment variables: PATH and JAVA_HOME, you will encounter problems on MacOS if these variables are not set within your Eclipse IDE process, e.g. the mvn executable might not be found.
 
-There are several methods to potentially address this on MacOS:
+There are several methods that can be used to potentially address this on MacOS:
 
 Start eclipse from the command line:
 
-To ensure that eclipse gets the correct PATH information, start eclipse from the command line in the eclipse IDE installation directory
-
-`>PATH=$PATH ./eclipse`
+- To ensure that eclipse gets the correct PATH information, start eclipse from the command line in the eclipse IDE installation directory
+- `>PATH=$PATH ./eclipse`
 
 Start eclipse through Finder:
 
