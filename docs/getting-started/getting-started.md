@@ -16,25 +16,21 @@
 
   Recommended minimum versions of:
 
-  - Liberty Maven Plugin -> 3.6.1
+  - Liberty Maven Plugin -> 3.7.1
     
-  - Liberty Gradle Plugin -> 3.4.1
+  - Liberty Gradle Plugin -> 3.5.1
 
-### Avoid trouble - Starting Eclipse with the correct environment on MacOS
+### Avoid trouble - Starting Eclipse with the correct environment
 
-Since the Liberty Tools feature uses the well-known environment variables: PATH and JAVA_HOME, you will encounter problems on MacOS if these variables are not set within your Eclipse IDE process, e.g. the mvn executable might not be found.
+Since the Liberty Tools feature uses the well-known environment variables: PATH and JAVA_HOME, you will encounter problems if these variables are not set within your Eclipse IDE process, e.g. the mvn executable might not be found.
 
-There are several methods that can be used to potentially address this on MacOS:
+There are several methods that can be used to potentially address this:
 
-1. Start eclipse from the command line:
-    - To ensure that eclipse gets the correct PATH information, start eclipse from the command line in the eclipse IDE installation directory
-    - `PATH=$PATH ./eclipse`
-
-2. Start eclipse through Finder:
+1. On MacOS, start eclipse through Finder:
     - right-click your Eclipse application and choose Show Package Contents.
     - Enter the newly displayed Contents folder, select MacOS, and then run Eclipse by clicking the displayed executable.
 
-3. Generate a mvn wrapper into the project:
+2. Generate a mvn wrapper into the project:
     - In your project folder execute the mvn wrapper create command:
     - `mvn org.apache.maven.plugins:maven-wrapper-plugin:3.1.1:wrapper`
     - start eclipse as normal
