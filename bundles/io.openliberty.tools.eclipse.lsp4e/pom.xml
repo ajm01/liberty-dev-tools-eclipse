@@ -27,7 +27,7 @@
     <properties>
         <liberty.ls.version>2.1-SNAPSHOT</liberty.ls.version>
         <jakarta.ls.version>0.2.0-SNAPSHOT</jakarta.ls.version>
-        <mp.ls.version>0.11.0-SNAPSHOT</mp.ls.version>
+        <mp.ls.version>0.12.0-SNAPSHOT</mp.ls.version>
     </properties>
 
     <artifactId>io.openliberty.tools.eclipse.lsp4e</artifactId>
@@ -79,7 +79,7 @@
                                   <classifier>uber</classifier>
                                   <type>jar</type>
                                   <overWrite>true</overWrite>
-                                  <destFileName>org.eclipse.lsp4mp.ls.jar</destFileName>
+                                  <destFileName>org.eclipse.lsp4mp.ls.jar.old</destFileName>
                                 </artifactItem>
                                </artifactItems> 
                               <outputDirectory>${project.basedir}/server/mp-langserver</outputDirectory>

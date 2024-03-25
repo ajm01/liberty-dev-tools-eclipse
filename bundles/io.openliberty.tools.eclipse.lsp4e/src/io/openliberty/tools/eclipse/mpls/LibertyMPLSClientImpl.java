@@ -36,39 +36,48 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
-import org.eclipse.lspcommon.JavaCursorContextResult;
-import org.eclipse.lspcommon.JavaDefinitionParams;
-import org.eclipse.lspcommon.JavaDiagnosticsParams;
-import org.eclipse.lspcommon.JavaFileInfoParams;
-import org.eclipse.lspcommon.JavaHoverParams;
-import org.eclipse.lspcommon.JavaProjectLabelsParams;
+import org.eclipse.lsp4jdt.commons.JavaCursorContextResult;
+import org.eclipse.lsp4jdt.commons.JavaDefinitionParams;
+import org.eclipse.lsp4jdt.commons.JavaDiagnosticsParams;
+import org.eclipse.lsp4jdt.commons.JavaFileInfoParams;
+import org.eclipse.lsp4jdt.commons.JavaHoverParams;
+import org.eclipse.lsp4jdt.commons.JavaProjectLabelsParams;
 //import org.eclipse.lspcommon.jdt.core.utils.IJDTUtils;
-import org.eclipse.lspcommon.JavaFileInfo;
+import org.eclipse.lsp4jdt.commons.JavaFileInfo;
 import org.eclipse.lsp4mp.commons.MicroProfileDefinition;
-import org.eclipse.lsp4mp.commons.MicroProfileJavaDiagnosticsParams;
+import org.eclipse.lsp4jdt.commons.JavaCodeActionParams;
+import org.eclipse.lsp4jdt.commons.JavaCodeLensParams;
+import org.eclipse.lsp4jdt.commons.JavaCompletionParams;
+import org.eclipse.lsp4jdt.commons.JavaCompletionResult;
+import org.eclipse.lsp4jdt.commons.JavaDefinitionParams;
+import org.eclipse.lsp4jdt.commons.JavaDiagnosticsParams;
+import org.eclipse.lsp4jdt.commons.JavaFileInfoParams;
+import org.eclipse.lsp4jdt.commons.JavaHoverParams;
+import org.eclipse.lsp4jdt.commons.JavaProjectLabelsParams;
 import org.eclipse.lsp4mp.commons.MicroProfileProjectInfo;
 import org.eclipse.lsp4mp.commons.MicroProfileProjectInfoParams;
 import org.eclipse.lsp4mp.commons.MicroProfilePropertyDefinitionParams;
 import org.eclipse.lsp4mp.commons.MicroProfilePropertyDocumentationParams;
-import org.eclipse.lspcommon.ProjectLabelInfoEntry;
-import org.eclipse.lspcommon.core.codeaction.CodeActionResolveData;
 import org.eclipse.lsp4mp.commons.diagnostics.MicroProfileDiagnosticsHandler;
+import org.eclipse.lsp4jdt.commons.ProjectLabelInfoEntry;
 import org.eclipse.lsp4mp.commons.utils.JSONUtility;
 import org.eclipse.lsp4mp.jdt.core.IMicroProfilePropertiesChangedListener;
+import org.eclipse.lsp4mp.jdt.core.MPNewPropertiesManagerForJava;
 import org.eclipse.lsp4mp.jdt.core.MicroProfileCorePlugin;
-import org.eclipse.lspcommon.jdt.core.ProjectLabelManager;
+import org.eclipse.lsp4jdt.core.ProjectLabelManager;
 import org.eclipse.lsp4mp.jdt.core.PropertiesManager;
+import org.eclipse.lsp4mp.jdt.core.PropertiesManagerForJava;
 //import org.eclipse.lsp4mp.jdt.core.PropertiesManagerForJava;
-import org.eclipse.lspcommon.jdt.internal.core.ls.JDTUtilsLSImpl;
+import org.eclipse.lsp4jdt.internal.core.ls.JDTUtilsLSImpl;
 import org.eclipse.lsp4mp.ls.api.MicroProfileLanguageClientAPI;
 import org.eclipse.lsp4mp.ls.api.MicroProfileLanguageServerAPI;
-import org.eclipse.lspcommon.JavaCodeActionParams;
-import org.eclipse.lspcommon.JavaCodeLensParams;
-import org.eclipse.lspcommon.JavaCompletionParams;
-import org.eclipse.lspcommon.JavaCompletionResult;
+import org.eclipse.lsp4jdt.commons.JavaCodeActionParams;
+import org.eclipse.lsp4jdt.commons.JavaCodeLensParams;
+import org.eclipse.lsp4jdt.commons.JavaCompletionParams;
+import org.eclipse.lsp4jdt.commons.JavaCompletionResult;
+import org.eclipse.lsp4jdt.commons.codeaction.CodeActionResolveData;
 
 import io.openliberty.tools.eclipse.ls.plugin.LibertyToolsLSPlugin;
-import org.eclipse.lsp4mp.jdt.core.MPNewPropertiesManagerForJava;
 
 /**
  * Liberty Devex MicroProfile language client.
@@ -130,7 +139,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync((cancelChecker) -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                return MPNewPropertiesManagerForJava.getInstance().codeLens(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+                return PropertiesManagerForJava.getInstance().codeLens(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
                 return Collections.emptyList();
@@ -139,14 +148,16 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
     }
 
     @Override
-    public CompletableFuture<List<PublishDiagnosticsParams>> getJavaDiagnostics(Object javaParams) {
+    public CompletableFuture<List<PublishDiagnosticsParams>> getJavaDiagnostics(JavaDiagnosticsParams javaParams) {
     	  	
-    	MicroProfileDiagnosticsHandler mpDiagnosticsHandler = (MicroProfileDiagnosticsHandler) MPNewPropertiesManagerForJava.getInstance().getDiagnosticsHandler();
+    	MicroProfileDiagnosticsHandler mpDiagnosticsHandler = (MicroProfileDiagnosticsHandler) PropertiesManagerForJava.getInstance().getDiagnosticsHandler();
     	   	
         return CompletableFutures.computeAsync((cancelChecker) -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                return mpDiagnosticsHandler.diagnostics(MPNewPropertiesManagerForJava.getInstance().getPluginId(), javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+                //return mpDiagnosticsHandler.diagnostics(MPNewPropertiesManagerForJava.getInstance().getPluginId(), javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+                return mpDiagnosticsHandler.diagnostics(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+
             	
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
@@ -217,9 +228,9 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync(cancelChecker -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                CompletionList completionList = MPNewPropertiesManagerForJava.getInstance().completion(javaParams, org.eclipse.lspcommon.jdt.internal.core.ls.JDTUtilsLSImpl.getInstance(), monitor);
+                CompletionList completionList = MPNewPropertiesManagerForJava.getInstance().completion(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
                 JavaCursorContextResult javaCursorContext = MPNewPropertiesManagerForJava.getInstance().javaCursorContext(javaParams,
-                		org.eclipse.lspcommon.jdt.internal.core.ls.JDTUtilsLSImpl.getInstance(), monitor);
+                		JDTUtilsLSImpl.getInstance(), monitor);
                 return new JavaCompletionResult(completionList, javaCursorContext);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
@@ -249,7 +260,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
                 // Deserialize CodeAction#data which is a JSonObject to CodeActionResolveData
                 CodeActionResolveData resolveData = JSONUtility.toModel(unresolved.getData(), CodeActionResolveData.class);
                 unresolved.setData(resolveData);
-                return MPNewPropertiesManagerForJava.getInstance().resolveCodeAction(unresolved, JDTUtilsLSImpl.getInstance(), monitor);
+                return PropertiesManagerForJava.getInstance().resolveCodeAction(unresolved, JDTUtilsLSImpl.getInstance(), monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
                 return null;
@@ -257,21 +268,22 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         });
     }
 
-    @Override
-    public CompletableFuture<String> getPropertyDocumentation(MicroProfilePropertyDocumentationParams arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public CompletableFuture<String> getPropertyDocumentation(MicroProfilePropertyDocumentationParams arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public CompletableFuture<JavaCursorContextResult> getJavaCursorContext(JavaCompletionParams arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public CompletableFuture<JavaCursorContextResult> getJavaCursorContext(JavaCompletionParams arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public CompletableFuture<List<SymbolInformation>> getJavaWorkspaceSymbols(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public CompletableFuture<List<SymbolInformation>> getJavaWorkspaceSymbols(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
