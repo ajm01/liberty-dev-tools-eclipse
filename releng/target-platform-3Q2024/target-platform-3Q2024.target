@@ -11,8 +11,7 @@
   
   Contributors:
       IBM Corporation - initial implementation
--->
-<target includeMode="feature" name="target-platform.target" sequenceNumber="16">
+--><target includeMode="feature" name="target-platform.target" sequenceNumber="16">
     <locations>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
             <repository location="https://download.eclipse.org/releases/2024-09/"/>
@@ -69,10 +68,6 @@
             <unit id="org.eclipse.tm.terminal.view.feature.source.feature.group" version="11.6.1.202406241230"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-            <repository location="http://download.eclipse.org/lsp4mp/releases/0.13.2/repository/"/>
-            <unit id="org.eclipse.lsp4mp.jdt.core" version="0.13.2.20241022-1352"/>
-        </location>
-        <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
             <repository location="https://download.eclipse.org/lsp4jakarta/releases/0.2.2/repository/"/>
             <unit id="org.eclipse.lsp4jakarta.jdt.core" version="0.2.2"/>
         </location>
@@ -89,39 +84,48 @@
             <repository location="https://download.eclipse.org/buildship/updates/e427/releases/3.x/3.1.9.v20240115-1636/"/>
             <unit id="org.eclipse.buildship.ui" version="3.1.9.v20240115-1636"/>
         </location>
-        <location includeDependencyDepth="none" includeDependencyScopes="compile" missingManifest="generate" type="Maven">
-            <dependencies>
-                <dependency>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy-agent</artifactId>
-                    <version>1.14.18</version>
-                    <type>jar</type>
-                </dependency>
-                <dependency>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                    <version>1.14.18</version>
-                    <type>jar</type>
-                </dependency>
-                <dependency>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-core</artifactId>
-                    <version>5.12.0</version>
-                    <type>jar</type>
-                </dependency>
-                <dependency>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-junit-jupiter</artifactId>
-                    <version>5.12.0</version>
-                    <type>jar</type>
-                </dependency>
-                <dependency>
-                    <groupId>org.objenesis</groupId>
-                    <artifactId>objenesis</artifactId>
-                    <version>3.4</version>
-                    <type>jar</type>
-                </dependency>
-            </dependencies>
-        </location>       
+	        <!--
+		       ie: lsp4jdt-poc/org.eclipse.lsp4jdt.site/target/org.eclipse.lsp4jdt.site-0.0.1-SNAPSHOT.zip!
+		    -->
+	    <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+		    <repository location="REPLACE_WITH_LSP4JDT_POC_SITE_DIRECTORY"/>
+	    </location>
+	    <location includeDependencyDepth="none" includeDependencyScopes="compile" missingManifest="generate" type="Maven">
+		    <dependencies>
+			    <dependency>
+				    <groupId>net.bytebuddy</groupId>
+				    <artifactId>byte-buddy-agent</artifactId>
+				    <version>1.14.18</version>
+				    <type>jar</type>
+			    </dependency>
+			    <dependency>
+				    <groupId>net.bytebuddy</groupId>
+				    <artifactId>byte-buddy</artifactId>
+				    <version>1.14.18</version>
+				    <type>jar</type>
+			    </dependency>
+			    <dependency>
+				    <groupId>org.mockito</groupId>
+				    <artifactId>mockito-core</artifactId>
+				    <version>5.12.0</version>
+				    <type>jar</type>
+			    </dependency>
+			    <dependency>
+				    <groupId>org.mockito</groupId>
+				    <artifactId>mockito-junit-jupiter</artifactId>
+				    <version>5.12.0</version>
+				    <type>jar</type>
+			    </dependency>
+			    <dependency>
+				    <groupId>org.objenesis</groupId>
+				    <artifactId>objenesis</artifactId>
+				    <version>3.4</version>
+				    <type>jar</type>
+			    </dependency>
+		    </dependencies>
+	    </location>
+	    <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+		    <repository location="REPLACE_WITH_LSP4MP_POC_SITE_DIRECTORY"/>
+	    </location>
     </locations>
 </target>

@@ -79,7 +79,8 @@
                                   <classifier>uber</classifier>
                                   <type>jar</type>
                                   <overWrite>true</overWrite>
-                                  <destFileName>org.eclipse.lsp4mp.ls.jar</destFileName>
+                                  <!-- for this poc - 'turn off' the use of the lsp4mp official ls jar -->
+                                  <destFileName>org.eclipse.lsp4mp.ls.jar.old</destFileName>
                                 </artifactItem>
                                </artifactItems> 
                               <outputDirectory>${project.basedir}/server/mp-langserver</outputDirectory>
